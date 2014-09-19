@@ -34,3 +34,8 @@ G:\Condivisa\Tommasini\Software\sorgenti\LettoreAudiolibri\LettoreAudiolibri\bin
 G:\Condivisa\Tommasini\Software\sorgenti\LettoreAudiolibri\LettoreAudiolibri\obj\x86\Debug\WindowsFormsApplication1.Form1.resources
 G:\Condivisa\Tommasini\Software\sorgenti\LettoreAudiolibri\LettoreAudiolibri\obj\x86\Debug\WindowsFormsApplication1.Properties.Resources.resources
 G:\Condivisa\Tommasini\Software\sorgenti\LettoreAudiolibri\LettoreAudiolibri\obj\x86\Debug\LettoreAudiolibri.csproj.GenerateResource.Cache
+C:\Users\davide\Documents\GitHub\LettoreAudiolibri\LettoreAudiolibri\obj\x86\Debug\Interop.WMPLib.dll
+C:\Users\davide\Documents\GitHub\LettoreAudiolibri\LettoreAudiolibri\obj\x86\Debug\AxInterop.WMPLib.dll
+C:\Users\davide\Documents\GitHub\LettoreAudiolibri\LettoreAudiolibri\obj\x86\Debug\LettoreAudiolibri.csproj.ResolveComReference.cache
+C:\Users\davide\Documents\GitHub\LettoreAudiolibri\LettoreAudiolibri\obj\x86\Debug\LettoreAudiolibri.exe
+C:\Users\davide\Documents\GitHub\LettoreAudiolibri\LettoreAudiolibri\obj\x86\Debug\LettoreAudiolibri.pdb

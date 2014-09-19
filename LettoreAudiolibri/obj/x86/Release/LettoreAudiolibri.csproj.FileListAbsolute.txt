@@ -23,3 +23,16 @@ G:\Condivisa\Tommasini\sorgenti\LettoreAudiolibri\LettoreAudiolibri\obj\x86\Rele
 G:\Condivisa\Tommasini\sorgenti\LettoreAudiolibri\LettoreAudiolibri\obj\x86\Release\WindowsFormsApplication1.Properties.Resources.resources
 G:\Condivisa\Tommasini\sorgenti\LettoreAudiolibri\LettoreAudiolibri\obj\x86\Release\LettoreAudiolibri.csproj.GenerateResource.Cache
 G:\Condivisa\Tommasini\sorgenti\LettoreAudiolibri\LettoreAudiolibri\obj\x86\Release\LettoreAudiolibri.csprojResolveAssemblyReference.cache
+C:\Users\davide\Documents\GitHub\LettoreAudiolibri\LettoreAudiolibri\obj\x86\Release\Interop.WMPLib.dll
+C:\Users\davide\Documents\GitHub\LettoreAudiolibri\LettoreAudiolibri\obj\x86\Release\AxInterop.WMPLib.dll
+C:\Users\davide\Documents\GitHub\LettoreAudiolibri\LettoreAudiolibri\obj\x86\Release\LettoreAudiolibri.csproj.ResolveComReference.cache
+C:\Users\davide\Documents\GitHub\LettoreAudiolibri\LettoreAudiolibri\obj\x86\Release\LettoreAudiolibri.exe
+C:\Users\davide\Documents\GitHub\LettoreAudiolibri\LettoreAudiolibri\obj\x86\Release\LettoreAudiolibri.pdb
+C:\Users\davide\Documents\GitHub\LettoreAudiolibri\LettoreAudiolibri\bin\Release\LettoreAudiolibri.exe
+C:\Users\davide\Documents\GitHub\LettoreAudiolibri\LettoreAudiolibri\bin\Release\LettoreAudiolibri.pdb
+C:\Users\davide\Documents\GitHub\LettoreAudiolibri\LettoreAudiolibri\bin\Release\Interop.WMPLib.dll
+C:\Users\davide\Documents\GitHub\LettoreAudiolibri\LettoreAudiolibri\bin\Release\AxInterop.WMPLib.dll
+C:\Users\davide\Documents\GitHub\LettoreAudiolibri\LettoreAudiolibri\obj\x86\Release\LettoreAudiolibri.csprojResolveAssemblyReference.cache
+C:\Users\davide\Documents\GitHub\LettoreAudiolibri\LettoreAudiolibri\obj\x86\Release\WindowsFormsApplication1.Form1.resources
+C:\Users\davide\Documents\GitHub\LettoreAudiolibri\LettoreAudiolibri\obj\x86\Release\WindowsFormsApplication1.Properties.Resources.resources
+C:\Users\davide\Documents\GitHub\LettoreAudiolibri\LettoreAudiolibri\obj\x86\Release\LettoreAudiolibri.csproj.GenerateResource.Cache

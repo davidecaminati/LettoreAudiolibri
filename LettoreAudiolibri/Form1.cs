@@ -1,4 +1,12 @@
-﻿using System;
+﻿/* Programma scritto da Davide Caminati il 19/9/2014
+ * davide.caminati@gmail.com
+ * http://caminatidavide.it/
+ * 
+ * licenza copyleft 
+ * http://it.wikipedia.org/wiki/Copyleft#Come_si_applica_il_copyleft
+ */
+
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -16,6 +24,10 @@ namespace WindowsFormsApplication1
         string percorso;
         WMPLib.WindowsMediaPlayer Player;
         bool onPause = false;
+        Configuration conf;
+        string currentPositionFilePath = "";
+        SpeechSynthesizer Synth = new SpeechSynthesizer();
+
         public Form1()
         {
             InitializeComponent();
@@ -26,20 +38,25 @@ namespace WindowsFormsApplication1
             Parla("Audiolibri");
             string folder = @System.IO.Path.GetDirectoryName(@System.Reflection.Assembly.GetExecutingAssembly().Location);
             string path_fileconfig = folder + @"\config.txt";
+            currentPositionFilePath = folder;
             //check if config file exist
             if (!System.IO.File.Exists(path_fileconfig))
             {
             //create default file config
                 //first line for directory of the audiolibri directorys
-                string[] lines = { @"C:" };
+                string[] lines = { @"C:", "|COM9" };
                 // WriteAllLines creates a file, writes a collection of strings to the file,
                 // and then closes the file.
                 System.IO.File.WriteAllLines(path_fileconfig, lines);
             }
             // read config file
-            StreamReader sr =  System.IO.File.OpenText(path_fileconfig);
-            percorso = sr.ReadLine();
-            string[] elencolibri = Directory.GetDirectories(percorso);
+            ReadConfigFile(path_fileconfig);
+            percorso = conf.BookPath;
+            //StreamReader sr =  System.IO.File.OpenText(path_fileconfig);
+            //percorso = sr.ReadLine();
+
+
+            string[] elencolibri = Directory.GetDirectories(conf.BookPath);
             //append to the elencolibri each foldername finded in the path of the audiolibri
             foreach (string libro in elencolibri)
             {
@@ -54,17 +71,92 @@ namespace WindowsFormsApplication1
             
         }
 
-        static void Parla(string args)
+        private bool CheckIfAllreadyPlayed(string filename)
         {
+            if (!System.IO.File.Exists(Path.Combine(currentPositionFilePath, filename)))
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
 
-            // Initialize a new instance of the SpeechSynthesizer.
-            SpeechSynthesizer synth = new SpeechSynthesizer();
+        private void SaveCurrentPosition()
+        {
+            string filename = Player.controls.currentItem.name;
+            //get the actual player position
+            double position = Player.controls.currentPosition;
+            //save the position to file
+            System.IO.File.WriteAllText(Path.Combine(currentPositionFilePath, filename), position.ToString());
+        }
 
-            // Configure the audio output. 
-            synth.SetOutputToDefaultAudioDevice();
 
-            synth.Speak(args);
+        private void SetActualPlayTime(string filename)
+        {
+            string currentPosition = "";
+            currentPosition = System.IO.File.ReadAllText(Path.Combine(currentPositionFilePath, filename));
+            Player.controls.currentPosition =  Convert.ToDouble(currentPosition);
+        }
 
+        private void ReadConfigFile(string configFilePath)
+        {
+            try
+            {
+                string line;
+                string portName = "";
+                string path = "";
+                // Read the configuration file line by line.
+                System.IO.StreamReader file = new System.IO.StreamReader(@configFilePath);
+                while ((line = file.ReadLine()) != null)
+                {
+                    if (line.StartsWith("@"))
+                    {
+                        path = line.Split('@')[1];
+                    }
+                    if (line.StartsWith("|"))
+                    {
+                        portName = line.Split('|')[1];
+                    }
+                }
+                file.Close();
+
+                conf = new Configuration(portName, path);
+            }
+            catch (Exception ex)
+            {
+                ParlaBloccante("il file di configurazione non puo' essere aperto causa: " + ex.Message);
+            }
+        }
+
+
+
+        private void Muto()
+        {
+            Synth.SpeakAsyncCancelAll();
+        }
+
+        /// <summary>
+        /// attiva il Synt vocale e riproduce il testo passato come parametro (puo' essere interrotto da un'altra riproduzione)
+        /// </summary>
+        /// <param name="args">testo da pronunciare</param>
+        private void Parla(string args)
+        {
+            Muto();
+            Synth.SpeakAsyncCancelAll();
+            Synth.SpeakAsync(args);
+        }
+
+        /// <summary>
+        /// attiva il Synt vocale e riproduce il testo passato come parametro (NON puo' essere interrotto da un'altra riproduzione)
+        /// </summary>
+        /// <param name="args">testo da pronunciare</param>
+        private void ParlaBloccante(string args)
+        {
+            Muto();
+            Synth.SpeakAsyncCancelAll();
+            Synth.Speak(args);
         }
 
         private void listViewFolder_SelectedIndexChanged(object sender, EventArgs e)
@@ -146,6 +238,7 @@ namespace WindowsFormsApplication1
                         }
                     }
                     break;
+
             }
         }
 
@@ -217,6 +310,10 @@ namespace WindowsFormsApplication1
                         }
                     }
                     break;
+
+                case Keys.A:
+                    SaveCurrentPosition();
+                    break;
             }
         }
 
@@ -233,17 +330,19 @@ namespace WindowsFormsApplication1
             }
         }
 
-        private void PlayFile(String url)
+        private void PlayFile(String url, double pos = 0.0)
         {
+            Muto();
             Player = new WMPLib.WindowsMediaPlayer();
             Player.PlayStateChange +=
                 new WMPLib._WMPOCXEvents_PlayStateChangeEventHandler(Player_PlayStateChange);
             Player.MediaError +=
                 new WMPLib._WMPOCXEvents_MediaErrorEventHandler(Player_MediaError);
             Player.URL = url;
-            double pos = Player.controls.currentPosition;
-            pos += 10;
-            Player.controls.currentPosition = pos;
+            if (pos != 0.0)
+            { 
+                Player.controls.currentPosition = pos;
+            }
 
         }
 
@@ -251,6 +350,7 @@ namespace WindowsFormsApplication1
         {
             try
             {
+                SaveCurrentPosition();
                 Player.controls.stop();
                 
                 onPause = false;
