@@ -16,61 +16,69 @@ using System.Text;
 using System.Windows.Forms;
 using System.IO;
 using System.Speech.Synthesis;
+using System.Xml;
+using System.Text.RegularExpressions;
+using System.Net;
+using System.IO.Ports;
+using System.Diagnostics;
 
 namespace WindowsFormsApplication1
 {
     public partial class Form1 : Form
     {
-        string percorso;
-        WMPLib.WindowsMediaPlayer Player;
+        // VARIABLES
         bool onPause = false;
-        Configuration conf;
         string currentPositionFilePath = "";
+
+        // OBJECTS
+        Configuration Conf = new Configuration();
+        WMPLib.WindowsMediaPlayer Player;
         SpeechSynthesizer Synth = new SpeechSynthesizer();
 
         public Form1()
         {
             InitializeComponent();
+
+            //Conf.ReadConfigurationError += new EventHandler(ReadConfigurationError_Event);
+            Synth.SetOutputToDefaultAudioDevice();  // Configure the audio output for speech synth. 
+            
         }
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            Parla("Audiolibri");
-            string folder = @System.IO.Path.GetDirectoryName(@System.Reflection.Assembly.GetExecutingAssembly().Location);
-            string path_fileconfig = folder + @"\config.txt";
-            currentPositionFilePath = folder;
-            //check if config file exist
-            if (!System.IO.File.Exists(path_fileconfig))
-            {
-            //create default file config
-                //first line for directory of the audiolibri directorys
-                string[] lines = { @"C:", "|COM9" };
-                // WriteAllLines creates a file, writes a collection of strings to the file,
-                // and then closes the file.
-                System.IO.File.WriteAllLines(path_fileconfig, lines);
-            }
-            // read config file
-            ReadConfigFile(path_fileconfig);
-            percorso = conf.BookPath;
-            //StreamReader sr =  System.IO.File.OpenText(path_fileconfig);
-            //percorso = sr.ReadLine();
+            string fileconfig = @System.IO.Path.GetDirectoryName(@System.Reflection.Assembly.GetExecutingAssembly().Location) + @"\config.txt";
 
-
-            string[] elencolibri = Directory.GetDirectories(conf.BookPath);
-            //append to the elencolibri each foldername finded in the path of the audiolibri
-            foreach (string libro in elencolibri)
+            if (Conf.LoadConfiguration(fileconfig))
             {
-                listViewFolder.Items.Add(System.IO.Path.GetFileNameWithoutExtension(libro));
-            }
+                //StreamReader sr =  System.IO.File.OpenText(path_fileconfig);
+                //percorso = sr.ReadLine();
 
-            if (listViewFolder.Items.Count > 0)
-            {
-                listViewFolder.Items[0].Selected = true;
-                listViewFolder.Select();
+                string[] elencolibri = Directory.GetDirectories(Conf.BookPath);
+                //append to the elencolibri each foldername finded in the path of the audiolibri
+                foreach (string libro in elencolibri)
+                {
+                    listViewFolder.Items.Add(System.IO.Path.GetFileNameWithoutExtension(libro));
+                }
+
+                if (listViewFolder.Items.Count > 0)
+                {
+                    listViewFolder.Items[0].Selected = true;
+                    listViewFolder.Select();
+                }
             }
-            
+            else
+            {
+                MessageBox.Show(this, "errore nel caricamento del file di configurazione");
+            }
         }
 
+        /*
+        void ReadConfigurationError_Event(object sender, EventArgs e)
+        {
+            MessageBox.Show(this, "errore nel caricamento del file di configurazione");
+        }
+        */
+        
         private bool CheckIfAllreadyPlayed(string filename)
         {
             if (!System.IO.File.Exists(Path.Combine(currentPositionFilePath, filename)))
@@ -99,37 +107,6 @@ namespace WindowsFormsApplication1
             currentPosition = System.IO.File.ReadAllText(Path.Combine(currentPositionFilePath, filename));
             Player.controls.currentPosition =  Convert.ToDouble(currentPosition);
         }
-
-        private void ReadConfigFile(string configFilePath)
-        {
-            try
-            {
-                string line;
-                string portName = "";
-                string path = "";
-                // Read the configuration file line by line.
-                System.IO.StreamReader file = new System.IO.StreamReader(@configFilePath);
-                while ((line = file.ReadLine()) != null)
-                {
-                    if (line.StartsWith("@"))
-                    {
-                        path = line.Split('@')[1];
-                    }
-                    if (line.StartsWith("|"))
-                    {
-                        portName = line.Split('|')[1];
-                    }
-                }
-                file.Close();
-
-                conf = new Configuration(portName, path);
-            }
-            catch (Exception ex)
-            {
-                ParlaBloccante("il file di configurazione non puo' essere aperto causa: " + ex.Message);
-            }
-        }
-
 
 
         private void Muto()
@@ -185,7 +162,7 @@ namespace WindowsFormsApplication1
                     if ((listViewFolder.Items.Count > 0) && (listViewFolder.SelectedItems.Count > 0))
                     {
                         //popolate listViewMp3
-                        string[] listafile = GetListOfFile(Path.Combine(percorso, listViewFolder.SelectedItems[0].SubItems[0].Text));
+                        string[] listafile = GetListOfFile(Path.Combine(Conf.BookPath , listViewFolder.SelectedItems[0].SubItems[0].Text));
                         //delete old element in mp3 list
                         listViewMp3.Clear();
                         //add new element
@@ -211,7 +188,8 @@ namespace WindowsFormsApplication1
 
                 case Keys.Escape:
                     StopFile();
-                    Parla("Chiusura programma");
+                    Console.Beep();
+                    Console.Beep();
                     Console.Beep();
                     this.Close();
                     break;
@@ -276,7 +254,8 @@ namespace WindowsFormsApplication1
 
                 case Keys.Escape:
                     StopFile();
-                    Parla("Chiusura programma");
+                    Console.Beep();
+                    Console.Beep();
                     Console.Beep();
                     this.Close();
                     break;
@@ -286,7 +265,7 @@ namespace WindowsFormsApplication1
                     if ((listViewMp3.Items.Count > 0) && (listViewMp3.SelectedItems.Count > 0))
                     {
                         //find path for mp3 file
-                        string percorsofile = Path.Combine(percorso, listViewFolder.SelectedItems[0].SubItems[0].Text, listViewMp3.SelectedItems[0].SubItems[0].Text);
+                        string percorsofile = Path.Combine(Conf.BookPath, listViewFolder.SelectedItems[0].SubItems[0].Text, listViewMp3.SelectedItems[0].SubItems[0].Text);
                         //stop eventualy other file
                         StopFile();
                         // open mp3file
@@ -343,7 +322,7 @@ namespace WindowsFormsApplication1
             { 
                 Player.controls.currentPosition = pos;
             }
-
+            //Player.controls.play();
         }
 
         private void StopFile()
@@ -352,7 +331,7 @@ namespace WindowsFormsApplication1
             {
                 SaveCurrentPosition();
                 Player.controls.stop();
-                
+                Player.close();
                 onPause = false;
             }
             catch
